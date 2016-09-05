@@ -1,0 +1,113 @@
+/* 
+Sketch based on the test sketch for the Adafruit assembled Motor Shield for Arduino v2
+It won't work with v1.x motor shields! Only for the v2's with built in PWM
+control
+
+Originally designed for use with the Adafruit Motor Shield v2    ---->	http://www.adafruit.com/products/1438
+
+Modificación by Pentiumcadiz sept2016 para mover dos motores (2 ruedas) de robot-coche básico (banggood)
+*/
+
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_MS_PWMServoDriver.h"
+
+// Create the motor shield object with the default I2C address
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
+// Or, create it with a different I2C address (say for stacking)
+// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
+
+// Select which 'port' M1, M2, M3 or M4. In this case, M1
+Adafruit_DCMotor *motorIz = AFMS.getMotor(1);
+// motorD para la rueda izquierda --> Motor 2 en el shield
+Adafruit_DCMotor *motorD = AFMS.getMotor(2);
+
+
+// You can also make another motor on port M2
+//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+
+//////////////////////// SETUP  ///////////////////////////
+void setup() {
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  AFMS.begin();  // create with the default frequency 1.6KHz
+  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  motorIz->setSpeed(100);
+  motorD->setSpeed(100);
+  
+  motorIz->run(FORWARD);
+  // turn on motor
+  motorIz->run(RELEASE);
+  motorD->run(RELEASE);
+}
+
+////////////////////////  LOOP  ///////////////////////////
+void loop() {
+  uint8_t i;
+  
+  Serial.println("fase 1: ordeno adelante");
+
+  adelante();
+  adelante();
+  descanso();
+
+  Serial.println("fase 2: ordeno girar a la izqda");
+
+  giroi();
+  descanso();
+
+}  ////////////////////////  END  LOOP  ///////////////////////////
+
+
+// Funcion de paso adelante - Pentiumcadiz2016
+void adelante()
+{
+  Serial.println("Hacia adelante");
+
+  motorIz->run(FORWARD);
+  motorD->run(FORWARD);
+  delay(1000);
+
+}
+
+
+// Funcion de paso atrás - Pentiumcadiz2016
+void atras()
+{
+  Serial.println("Hacia atrás");
+
+  motorIz->run(BACKWARD);
+  motorD->run(BACKWARD);
+  delay(1000);
+
+}
+
+// Funcion de giro a la izquierda - Pentiumcadiz2016
+void giroi()
+{
+  Serial.println("-- Girando...");
+
+  motorIz->run(BACKWARD);
+  motorD->run(FORWARD);  // giro a la izquierda
+  delay(1000);
+  motorIz->run(RELEASE);
+  motorD->run(RELEASE);
+
+}
+
+// Funcion de descanso - Pentiumcadiz2016
+void descanso()
+{
+  Serial.println("Descanso 1 segundo");
+
+  motorIz->run(RELEASE);
+  motorD->run(RELEASE);
+  delay(1000);
+
+}
+
+
+
